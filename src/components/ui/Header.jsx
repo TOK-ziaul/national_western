@@ -7,7 +7,7 @@ const Header = () => {
           alt="logo"
           // width={100}
           // height={100}
-          className="w-[70%] sm:w-[80%] md:w-[80%] lg:w-full me-auto"
+          className="w-[70%] sm:w-[80%] md:w-[80%] lg:w-[90%] xl:w-[65%] me-auto"
         />
       </div>
       <div className="h-full x !w-fit">
@@ -15,7 +15,7 @@ const Header = () => {
           src="/legacyLogo.svg"
           alt="logo"
           // width={100}
-          className="w-[70%] sm:w-[80%]  md:w-[80%] lg:w-full ms-auto"
+          className="w-[70%] sm:w-[80%]  md:w-[80%] lg:w-[90%] xl:w-[65%] ms-auto"
           // height={100}
         />
       </div>
