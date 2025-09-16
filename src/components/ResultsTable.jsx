@@ -6,17 +6,15 @@ export default function ResultsTable({ results, onDonorClick }) {
           <tbody>
             {results.map((r, i) => (
               <tr
+                onClick={() => onDonorClick && onDonorClick(r)}
                 key={i}
-                className="hover:bg-gray-50 border-b text-navy-blue font-medium md:text-2xl text-lg flex items-center justify-between py-2 md:px-4 px-2"
+                className="hover:bg-gray-50 border-b text-navy-blue font-medium md:text-2xl text-lg flex items-center justify-between py-2 md:px-4 px-2 cursor-pointer"
               >
                 <td className="p-2 ">
                   <span className="text-navy-blue font-medium  me-4">
                     {i + 1}
                   </span>
-                  <button
-                    onClick={() => onDonorClick && onDonorClick(r)}
-                    className="text-navy-blue hover:text-blue-600 hover:underline cursor-pointer transition-colors"
-                  >
+                  <button className="text-navy-blue hover:text-blue-600   transition-colors">
                     {r.firstName} {r.lastName}
                   </button>
                 </td>

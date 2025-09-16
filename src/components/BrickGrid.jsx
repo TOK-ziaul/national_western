@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 
 const cols = Array.from({ length: 34 }, (_, i) => i + 1);
 
-export default function BrickGrid({ bricks, selectedBrick, onBrickSelect }) {
+export default function BrickGrid({ bricks, selectedBrick }) {
   const rows = generateRowLabels(52); // e.g., A-Z, AA-TT
   const gridRef = useRef(null);
   const selectedBrickRef = useRef(null);
@@ -98,14 +98,11 @@ export default function BrickGrid({ bricks, selectedBrick, onBrickSelect }) {
                   <div
                     key={`${r}${c}`}
                     ref={isSelected ? selectedBrickRef : null}
-                    onClick={() =>
-                      filled && onBrickSelect && onBrickSelect(filled)
-                    }
-                    className={`w-12 h-12 flex items-center justify-center text-sm font-medium rounded-md transition-all duration-200 ${
+                    className={`w-12 h-12 flex items-center justify-center text-sm font-medium rounded-md ${
                       filled
                         ? isSelected
                           ? "bg-blue-600 ring-4 ring-blue-300 shadow-lg"
-                          : "bg-navy-blue hover:bg-blue-700 cursor-pointer"
+                          : "bg-navy-blue"
                         : "bg-gray-200 text-gray-600"
                     }`}
                   />

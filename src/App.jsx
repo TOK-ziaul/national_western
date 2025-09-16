@@ -114,11 +114,6 @@ function App() {
     }
   };
 
-  // Handle brick click from grid
-  const handleBrickSelect = (brick) => {
-    setSelectedBrick(brick);
-  };
-
   // --- Render ---
   return (
     <Layout>
@@ -131,11 +126,7 @@ function App() {
               onSearch={(value, filter) => performSearch({ value, filter })}
               onFilterChange={(f) => console.log("Filter changed:", f)}
             />
-            <BrickGrid
-              bricks={results}
-              selectedBrick={selectedBrick}
-              onBrickSelect={handleBrickSelect}
-            />
+            <BrickGrid bricks={results} selectedBrick={selectedBrick} />
             <ResultsTable results={results} onDonorClick={handleDonorClick} />
           </div>
         </div>
