@@ -66,7 +66,6 @@ function App() {
     // Case 2: Called from BrickPlacementHeader
     if (criteria.filter && criteria.value) {
       const term = criteria.value.trim().toLowerCase();
-      console.log(criteria.filter);
 
       switch (criteria.filter) {
         case "ALL":
@@ -102,7 +101,6 @@ function App() {
     }
 
     const mapped = mapWithBricks(filtered);
-    console.log(filtered);
     setResults(mapped);
     setShowGrid(true);
   };
@@ -113,18 +111,14 @@ function App() {
       {!showGrid ? (
         <LegacySearchForm onSubmit={performSearch} />
       ) : (
-        <div className="max-w-7xl mx-auto p-8 ">
+        <div className="max-w-7xl mx-auto md:p-8 p-4 ">
           <div className="rounded-3xl overflow-hidden bg-white">
             <BrickPlacementHeader
               onSearch={(value, filter) => performSearch({ value, filter })}
               onFilterChange={(f) => console.log("Filter changed:", f)}
             />
             <BrickGrid bricks={results} />
-            {results.length > 0 && (
-              <div className="mt-8">
-                <ResultsTable results={results} />
-              </div>
-            )}
+            <ResultsTable results={results} />
           </div>
         </div>
       )}

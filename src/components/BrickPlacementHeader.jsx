@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { IoSearch } from "react-icons/io5";
 
 const schema = yup.object({
   searchTerm: yup.string().required("Search term is required"),
@@ -21,10 +22,7 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange }) => {
     },
   });
 
-  const watchedFilterValue = watch("filterValue");
-
   const onSubmitHandler = (data) => {
-    console.log("Header search data:", data);
     onSearch(data.searchTerm, data.filterValue);
   };
 
@@ -34,16 +32,16 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange }) => {
   };
 
   return (
-    <div className="bg-gray-100 px-6 pt-4 flex items-center justify-between border-b border-gray-200">
+    <div className="bg-white md:px-6 px-4 pt-4 flex flex-col md:flex-row justify-between border-b border-gray-200">
       {/* Title */}
-      <h1 className="text-3xl font-gin-test mb-2">
+      <h1 className="md:text-3xl text-2xl font-gin-test mb-2">
         NWSS BRICK PLACEMENT SEARCH
       </h1>
 
       {/* Search Controls */}
       <form
         onSubmit={handleSubmit(onSubmitHandler)}
-        className="flex items-center space-x-3"
+        className="flex items-end  justify-between md:justify-end"
       >
         {/* Filter Dropdown with Label */}
         <div className="flex items-center space-x-2">
@@ -54,7 +52,7 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange }) => {
               // Trigger form validation
               handleSubmit(onSubmitHandler)();
             }}
-            className="px-2 py-1 border border-gray-300 rounded bg-white text-gray-700 text-sm focus:outline-none focus:ring-none"
+            className="px-2 py-[0.32rem] md:text-[1.4rem] text-lg border border-gray-300/70 rounded bg-transparent text-gray-700/60  focus:outline-none focus:ring-none"
           >
             <option value="ALL">All</option>
             <option value="FIRSTNAME">First Name</option>
@@ -64,32 +62,20 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange }) => {
         </div>
 
         {/* Search Input with Icon */}
-        <div className="relative">
+        <div className="relative ">
           <input
             {...register("searchTerm")}
             type="text"
-            placeholder="Search..."
-            className={`pr-8 pl-3 py-1 border rounded bg-white text-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-40 ${
-              errors.searchTerm ? "border-red-500" : "border-gray-300"
+            placeholder="Search"
+            className={` pr-8 pl-3  py-[0.4rem]  border rounded bg-white text-gray-700 md:text-[1.4rem] text-lg focus:outline-none focus:ring-1 focus:ring-blue-500 w-48 ${
+              errors.searchTerm ? "border-red-500" : "  border-gray-300/70"
             }`}
           />
           <button
             type="submit"
-            className="w-4 h-4 text-gray-500 absolute right-2 top-1/2 transform -translate-y-1/2"
+            className=" text-gray-500 absolute right-2 top-1/2 transform -translate-y-1/2"
           >
-            <svg
-              className=""
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <IoSearch className="w-6 h-6 text-navy-blue" />
           </button>
           {errors.searchTerm && (
             <span className="text-red-500 text-xs absolute -bottom-4 left-0">

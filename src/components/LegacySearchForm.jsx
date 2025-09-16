@@ -27,7 +27,6 @@ const LegacySearchForm = ({ onSubmit }) => {
   });
 
   const onSubmitHandler = (data) => {
-    console.log("Search data:", data);
     onSubmit(data);
   };
 
