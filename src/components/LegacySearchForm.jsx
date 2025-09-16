@@ -10,10 +10,14 @@ const schema = yup
     inscription: yup.string(),
   })
   .test("at-least-one", "Please fill in at least one field", function (value) {
-    return value.firstName || value.lastName || value.inscription;
+    const hasValue =
+      value.firstName?.trim() ||
+      value.lastName?.trim() ||
+      value.inscription?.trim();
+    return hasValue;
   });
 
-const LegacySearchForm = () => {
+const LegacySearchForm = ({ onSubmit }) => {
   const {
     register,
     handleSubmit,
@@ -22,13 +26,15 @@ const LegacySearchForm = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
+  const onSubmitHandler = (data) => {
     console.log("Search data:", data);
-    // Handle form submission here
+    onSubmit(data);
   };
 
-  const inputClassName =
-    "w-full px-6 py-[0.9rem] rounded-2xl border-none bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-blue focus:border-transparent text-2xl font-medium";
+  const inputClassName = (hasError = false) =>
+    `w-full px-6 py-[0.9rem] rounded-2xl border-none bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-blue focus:border-transparent text-2xl font-medium ${
+      hasError ? "ring-2 ring-red-500" : ""
+    }`;
 
   return (
     <div className="xl:max-w-3xl mx-auto px-8 py-8 md:px-12 md:py-12 ">
@@ -36,7 +42,7 @@ const LegacySearchForm = () => {
         FILL IN THE DETAILS USING ANY ONE OF THE THREE OPTIONS.
       </h3>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-7">
+      <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-7">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 md:gap-y-8 gap-y-6 ">
           {/* First Name */}
           <div>
@@ -44,7 +50,7 @@ const LegacySearchForm = () => {
               {...register("firstName")}
               type="text"
               placeholder="First Name"
-              className={inputClassName}
+              className={inputClassName(!!(errors.root || errors[""]))}
             />
           </div>
 
@@ -54,7 +60,7 @@ const LegacySearchForm = () => {
               {...register("lastName")}
               type="text"
               placeholder="Last Name"
-              className={inputClassName}
+              className={inputClassName(!!(errors.root || errors[""]))}
             />
           </div>
           <div>
@@ -62,7 +68,7 @@ const LegacySearchForm = () => {
               {...register("inscription")}
               type="text"
               placeholder="Inscription"
-              className={inputClassName}
+              className={inputClassName(!!(errors.root || errors[""]))}
             />
           </div>
         </div>
@@ -70,9 +76,9 @@ const LegacySearchForm = () => {
         {/* Inscription */}
 
         {/* Error Message */}
-        {errors.root && (
-          <div className="text-red-600 text-sm font-medium">
-            {errors.root.message}
+        {(errors.root || errors[""]) && (
+          <div className="text-red-600 text-sm font-medium text-center">
+            {errors.root?.message || errors[""]?.message}
           </div>
         )}
 

@@ -13,6 +13,9 @@ export default {
         "gin-test-rough": ["Gin Test Rough", "sans-serif"],
         "gin-test-round": ["Gin Test Round", "sans-serif"],
       },
+      gridTemplateColumns: {
+        34: "repeat(34, minmax(0, 1fr))",
+      },
     },
   },
   plugins: [],
