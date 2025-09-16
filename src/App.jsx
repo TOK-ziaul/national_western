@@ -13,6 +13,7 @@ function App() {
   const [bricks, setBricks] = useState([]);
   const [results, setResults] = useState([]);
   const [showGrid, setShowGrid] = useState(false);
+  const [selectedBrick, setSelectedBrick] = useState(null);
 
   // Load Excel data
   useEffect(() => {
@@ -103,6 +104,19 @@ function App() {
     const mapped = mapWithBricks(filtered);
     setResults(mapped);
     setShowGrid(true);
+    setSelectedBrick(null); // Reset selection when new search is performed
+  };
+
+  // Handle donor click from results table
+  const handleDonorClick = (donor) => {
+    if (donor.row && donor.col) {
+      setSelectedBrick(donor);
+    }
+  };
+
+  // Handle brick click from grid
+  const handleBrickSelect = (brick) => {
+    setSelectedBrick(brick);
   };
 
   // --- Render ---
@@ -117,8 +131,12 @@ function App() {
               onSearch={(value, filter) => performSearch({ value, filter })}
               onFilterChange={(f) => console.log("Filter changed:", f)}
             />
-            <BrickGrid bricks={results} />
-            <ResultsTable results={results} />
+            <BrickGrid
+              bricks={results}
+              selectedBrick={selectedBrick}
+              onBrickSelect={handleBrickSelect}
+            />
+            <ResultsTable results={results} onDonorClick={handleDonorClick} />
           </div>
         </div>
       )}

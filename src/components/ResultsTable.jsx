@@ -1,4 +1,4 @@
-export default function ResultsTable({ results }) {
+export default function ResultsTable({ results, onDonorClick }) {
   return (
     <div className="mt-2 h-[12rem] overflow-y-auto ">
       {results.length > 0 ? (
@@ -13,7 +13,12 @@ export default function ResultsTable({ results }) {
                   <span className="text-navy-blue font-medium  me-4">
                     {i + 1}
                   </span>
-                  {r.firstName} {r.lastName}
+                  <button
+                    onClick={() => onDonorClick && onDonorClick(r)}
+                    className="text-navy-blue hover:text-blue-600 hover:underline cursor-pointer transition-colors"
+                  >
+                    {r.firstName} {r.lastName}
+                  </button>
                 </td>
                 <td className="p-2 ">
                   Row {r.row}, Col {r.col}
