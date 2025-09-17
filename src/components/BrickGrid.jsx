@@ -46,7 +46,7 @@ export default function BrickGrid({ bricks, selectedBrick }) {
       ref={gridRef}
       className="rounded-3xl shadow-lg w-full h-[calc(100vh-390px)] md:h-[calc(100vh-500px)] xl:h-[calc(100vh-300px)] overflow-auto"
     >
-      <div className="inline-block min-w-max">
+      <div className="inline-block min-w-max pe-4 pb-4">
         {/* Column headers */}
         <div className="grid grid-cols-[3rem_1fr] sticky top-0 bg-white z-20">
           <div className="w-14 h-14"></div> {/* corner */}
@@ -63,7 +63,7 @@ export default function BrickGrid({ bricks, selectedBrick }) {
         </div>
 
         {/* Row labels + grid */}
-        <div className="flex pe-4 pb-4">
+        <div className="flex ">
           {/* Row labels */}
           <div className="flex flex-col gap-2 sticky left-0 bg-white z-10">
             {rows.map((r) => (
