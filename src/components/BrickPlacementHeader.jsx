@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useEffect } from "react";
 import { IoSearch } from "react-icons/io5";
 import Dropdown from "./ui/Dropdown";
 
@@ -9,20 +10,31 @@ const schema = yup.object({
   filterValue: yup.string().required("Filter is required"),
 });
 
-const BrickPlacementHeader = ({ onSearch, onFilterChange }) => {
+const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
     setValue,
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      searchTerm: "",
-      filterValue: "ALL",
+      searchTerm: searchContext?.value || "",
+      filterValue: searchContext?.filter || "ALL",
     },
   });
+
+  // Update form values when searchContext changes
+  useEffect(() => {
+    if (searchContext) {
+      reset({
+        searchTerm: searchContext.value || "",
+        filterValue: searchContext.filter || "ALL",
+      });
+    }
+  }, [searchContext, reset]);
 
   const onSubmitHandler = (data) => {
     onSearch(data.searchTerm, data.filterValue);

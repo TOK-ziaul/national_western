@@ -14,6 +14,10 @@ function App() {
   const [results, setResults] = useState([]);
   const [showGrid, setShowGrid] = useState(false);
   const [selectedBrick, setSelectedBrick] = useState(null);
+  const [searchContext, setSearchContext] = useState({
+    value: "",
+    filter: "ALL",
+  });
 
   // Load Excel data
   useEffect(() => {
@@ -63,10 +67,25 @@ function App() {
             (u.inscription?.toLowerCase().includes(ins) ||
               u.inscription2?.toLowerCase().includes(ins)))
       );
+
+      // Determine which field was used and set search context
+      if (fName) {
+        setSearchContext({ value: criteria.firstName, filter: "FIRSTNAME" });
+      } else if (lName) {
+        setSearchContext({ value: criteria.lastName, filter: "LASTNAME" });
+      } else if (ins) {
+        setSearchContext({
+          value: criteria.inscription,
+          filter: "INSCRIPTION",
+        });
+      }
     }
     // Case 2: Called from BrickPlacementHeader
     if (criteria.filter && criteria.value) {
       const term = criteria.value.trim().toLowerCase();
+
+      // Update search context
+      setSearchContext({ value: criteria.value, filter: criteria.filter });
 
       switch (criteria.filter) {
         case "ALL":
@@ -125,6 +144,7 @@ function App() {
             <BrickPlacementHeader
               onSearch={(value, filter) => performSearch({ value, filter })}
               onFilterChange={(f) => console.log("Filter changed:", f)}
+              searchContext={searchContext}
             />
             <BrickGrid bricks={results} selectedBrick={selectedBrick} />
             <ResultsTable results={results} onDonorClick={handleDonorClick} />

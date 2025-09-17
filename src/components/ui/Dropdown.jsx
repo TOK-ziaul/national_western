@@ -43,7 +43,7 @@ const Dropdown = ({
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled}
         className={`
-          w-full px-4 pt-[0.4rem] pb-[9px]  text-left bg-white border border-gray-300/70 rounded-t-md
+          w-full px-4 pt-[0.4rem] pb-[9px]  text-gray-700 text-left bg-white border border-gray-300/70 rounded-t-md
           shadow-sm focus:outline-none
            transition-colors duration-200
           ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
@@ -64,7 +64,7 @@ const Dropdown = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg">
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg  text-gray-700">
           <ul className="py-0 max-h-60 overflow-auto">
             {options.map((option, index) => (
               <li key={option.value || index}>
