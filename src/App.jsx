@@ -14,6 +14,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [showGrid, setShowGrid] = useState(false);
   const [selectedBrick, setSelectedBrick] = useState(null);
+  const [isSimilarResults, setIsSimilarResults] = useState(false);
   const [searchContext, setSearchContext] = useState({
     value: "",
     filter: "",
@@ -71,6 +72,63 @@ function App() {
       };
     });
 
+  // Helper function to calculate similarity score
+  const calculateSimilarity = (searchTerm, targetTerm) => {
+    if (!searchTerm || !targetTerm) return 0;
+
+    const search = searchTerm.toLowerCase();
+    const target = targetTerm.toLowerCase();
+
+    // Exact match
+    if (target.includes(search)) return 1.0;
+
+    // Word-level matching
+    const searchWords = search.split(/\s+/).filter(Boolean);
+    const targetWords = target.split(/\s+/).filter(Boolean);
+
+    let wordMatches = 0;
+    searchWords.forEach((searchWord) => {
+      if (targetWords.some((targetWord) => targetWord.includes(searchWord))) {
+        wordMatches++;
+      }
+    });
+
+    return wordMatches / searchWords.length;
+  };
+
+  // Helper function to get similarity score for a user
+  const getUserSimilarityScore = (user, criteria) => {
+    const fName = criteria.firstName?.trim().toLowerCase();
+    const lName = criteria.lastName?.trim().toLowerCase();
+    const ins = criteria.inscription?.trim().toLowerCase();
+
+    let totalScore = 0;
+    let fieldCount = 0;
+
+    if (fName) {
+      const firstNameScore = calculateSimilarity(fName, user.firstName || "");
+      totalScore += firstNameScore;
+      fieldCount++;
+    }
+
+    if (lName) {
+      const lastNameScore = calculateSimilarity(lName, user.lastName || "");
+      totalScore += lastNameScore;
+      fieldCount++;
+    }
+
+    if (ins) {
+      const inscriptionScore = Math.max(
+        calculateSimilarity(ins, user.inscription || ""),
+        calculateSimilarity(ins, user.inscription2 || "")
+      );
+      totalScore += inscriptionScore;
+      fieldCount++;
+    }
+
+    return fieldCount > 0 ? totalScore / fieldCount : 0;
+  };
+
   // --- Common Search Function ---
   const performSearch = (criteria) => {
     let filtered = [];
@@ -94,9 +152,10 @@ function App() {
               (u.inscription?.toLowerCase().includes(ins) ||
                 u.inscription2?.toLowerCase().includes(ins)))
         );
+        setIsSimilarResults(false);
       } else {
-        // Multiple fields search - use AND logic
-        filtered = users.filter((u) => {
+        // Multiple fields search - try exact match first, then similarity
+        const exactMatches = users.filter((u) => {
           const matches = [];
 
           if (fName) {
@@ -115,6 +174,26 @@ function App() {
           // All filled fields must match (AND logic)
           return matches.every(Boolean);
         });
+
+        if (exactMatches.length > 0) {
+          // Use exact matches if found
+          filtered = exactMatches;
+          setIsSimilarResults(false);
+        } else {
+          // No exact matches - find similar results
+          const similarResults = users
+            .map((user) => ({
+              user,
+              similarityScore: getUserSimilarityScore(user, criteria),
+            }))
+            .filter((result) => result.similarityScore > 0.3) // Minimum 30% similarity
+            .sort((a, b) => b.similarityScore - a.similarityScore) // Sort by similarity
+            .slice(0, 20) // Limit to top 20 similar results
+            .map((result) => result.user);
+
+          filtered = similarResults;
+          setIsSimilarResults(true);
+        }
       }
 
       // Set search context based on primary field or combined search
@@ -193,7 +272,11 @@ function App() {
               searchContext={searchContext}
             />
             <BrickGrid bricks={results} selectedBrick={selectedBrick} />
-            <ResultsTable results={results} onDonorClick={handleDonorClick} />
+            <ResultsTable
+              results={results}
+              onDonorClick={handleDonorClick}
+              isSimilarResults={isSimilarResults}
+            />
           </div>
         </div>
       )}
