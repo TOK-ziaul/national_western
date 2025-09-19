@@ -22,7 +22,7 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
     resolver: yupResolver(schema),
     defaultValues: {
       searchTerm: searchContext?.value || "",
-      filterValue: searchContext?.filter || "ALL",
+      filterValue: searchContext?.filter || "",
     },
   });
 
@@ -31,7 +31,7 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
     if (searchContext) {
       reset({
         searchTerm: searchContext.value || "",
-        filterValue: searchContext.filter || "ALL",
+        filterValue: searchContext.filter || "",
       });
     }
   }, [searchContext, reset]);
@@ -50,7 +50,6 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
 
   // Dropdown options matching the original select
   const filterOptions = [
-    { value: "ALL", label: "All" },
     { value: "FIRSTNAME", label: "First Name" },
     { value: "LASTNAME", label: "Last Name" },
     { value: "INSCRIPTION", label: "Inscription" },

@@ -5,7 +5,7 @@ const Dropdown = ({
   options = [],
   selectedValue,
   onSelect,
-  placeholder = "Select an option",
+  placeholder = "Select",
   className = "",
   disabled = false,
 }) => {

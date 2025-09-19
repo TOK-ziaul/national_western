@@ -16,7 +16,7 @@ function App() {
   const [selectedBrick, setSelectedBrick] = useState(null);
   const [searchContext, setSearchContext] = useState({
     value: "",
-    filter: "ALL",
+    filter: "",
   });
 
   // Load Excel data
@@ -38,10 +38,32 @@ function App() {
     loadData();
   }, []);
 
+  const extractGiftId = (val) => {
+    const match = String(val).match(/^\d+/);
+    return match ? match[0] : null;
+  };
+
   // --- Helpers ---
   const mapWithBricks = (filteredUsers) =>
     filteredUsers.map((u) => {
-      const brick = bricks.find((b) => String(b.giftId) === String(u.id));
+      const inscriptionWords = u.inscription
+        ? u.inscription.toLowerCase().split(/\s+/).filter(Boolean)
+        : [];
+
+      const brick = bricks.find((b) => {
+        if (extractGiftId(b.giftId) === String(u.id)) {
+          if (
+            inscriptionWords.some((word) =>
+              String(b.giftId).toLowerCase().includes(word)
+            )
+          ) {
+            return true;
+          }
+        }
+
+        return String(b.giftId) === String(u.id);
+      });
+
       return {
         ...u,
         row: brick?.row || null,
@@ -59,24 +81,58 @@ function App() {
       const lName = criteria.lastName?.trim().toLowerCase();
       const ins = criteria.inscription?.trim().toLowerCase();
 
-      filtered = users.filter(
-        (u) =>
-          (fName && u.firstName?.toLowerCase().includes(fName)) ||
-          (lName && u.lastName?.toLowerCase().includes(lName)) ||
-          (ins &&
-            (u.inscription?.toLowerCase().includes(ins) ||
-              u.inscription2?.toLowerCase().includes(ins)))
-      );
+      // Count how many fields are filled
+      const filledFields = [fName, lName, ins].filter(Boolean).length;
 
-      // Determine which field was used and set search context
-      if (fName) {
-        setSearchContext({ value: criteria.firstName, filter: "FIRSTNAME" });
-      } else if (lName) {
-        setSearchContext({ value: criteria.lastName, filter: "LASTNAME" });
-      } else if (ins) {
+      if (filledFields === 1) {
+        // Single field search - use OR logic
+        filtered = users.filter(
+          (u) =>
+            (fName && u.firstName?.toLowerCase().includes(fName)) ||
+            (lName && u.lastName?.toLowerCase().includes(lName)) ||
+            (ins &&
+              (u.inscription?.toLowerCase().includes(ins) ||
+                u.inscription2?.toLowerCase().includes(ins)))
+        );
+      } else {
+        // Multiple fields search - use AND logic
+        filtered = users.filter((u) => {
+          const matches = [];
+
+          if (fName) {
+            matches.push(u.firstName?.toLowerCase().includes(fName));
+          }
+          if (lName) {
+            matches.push(u.lastName?.toLowerCase().includes(lName));
+          }
+          if (ins) {
+            matches.push(
+              u.inscription?.toLowerCase().includes(ins) ||
+                u.inscription2?.toLowerCase().includes(ins)
+            );
+          }
+
+          // All filled fields must match (AND logic)
+          return matches.every(Boolean);
+        });
+      }
+
+      // Set search context based on primary field or combined search
+      if (filledFields === 1) {
+        if (fName) {
+          setSearchContext({ value: criteria.firstName, filter: "FIRSTNAME" });
+        } else if (lName) {
+          setSearchContext({ value: criteria.lastName, filter: "LASTNAME" });
+        } else if (ins) {
+          setSearchContext({
+            value: criteria.inscription,
+            filter: "INSCRIPTION",
+          });
+        }
+      } else {
         setSearchContext({
-          value: criteria.inscription,
-          filter: "INSCRIPTION",
+          value: "",
+          filter: "",
         });
       }
     }
@@ -88,16 +144,6 @@ function App() {
       setSearchContext({ value: criteria.value, filter: criteria.filter });
 
       switch (criteria.filter) {
-        case "ALL":
-          // for this case the filter should be applied to all fields
-          filtered = users.filter(
-            (u) =>
-              u.firstName?.toLowerCase().includes(term) ||
-              u.lastName?.toLowerCase().includes(term) ||
-              u.inscription?.toLowerCase().includes(term) ||
-              u.inscription2?.toLowerCase().includes(term)
-          );
-          break;
         case "FIRSTNAME":
           filtered = users.filter((u) =>
             u.firstName?.toLowerCase().includes(term)
