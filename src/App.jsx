@@ -133,118 +133,123 @@ function App() {
   const performSearch = (criteria) => {
     let filtered = [];
 
-    // Case 1: Called from LegacySearchForm
-    if (criteria.firstName || criteria.lastName || criteria.inscription) {
-      const fName = criteria.firstName?.trim().toLowerCase();
-      const lName = criteria.lastName?.trim().toLowerCase();
-      const ins = criteria.inscription?.trim().toLowerCase();
+    const fName = criteria.firstName?.trim().toLowerCase();
+    const lName = criteria.lastName?.trim().toLowerCase();
+    const ins = criteria.inscription?.trim().toLowerCase();
 
-      // Count how many fields are filled
-      const filledFields = [fName, lName, ins].filter(Boolean).length;
+    const filledFields = [fName, lName, ins].filter(Boolean).length;
 
-      if (filledFields === 1) {
-        // Single field search - use OR logic
-        filtered = users.filter(
-          (u) =>
-            (fName && u.firstName?.toLowerCase().includes(fName)) ||
-            (lName && u.lastName?.toLowerCase().includes(lName)) ||
-            (ins &&
-              (u.inscription?.toLowerCase().includes(ins) ||
-                u.inscription2?.toLowerCase().includes(ins)))
-        );
+    // === Form search (LegacySearchForm) ===
+    if (filledFields > 0) {
+      // Exact matches first
+      const exactMatches = users.filter((u) => {
+        const userFName = u.firstName?.trim().toLowerCase() || "";
+        const userLName = u.lastName?.trim().toLowerCase() || "";
+        const userIns1 = u.inscription?.trim().toLowerCase() || "";
+        const userIns2 = u.inscription2?.trim().toLowerCase() || "";
+
+        const firstNameMatch = fName ? userFName === fName : true;
+        const lastNameMatch = lName ? userLName === lName : true;
+        const inscriptionMatch = ins
+          ? userIns1.includes(ins) || userIns2.includes(ins)
+          : true;
+
+        return firstNameMatch && lastNameMatch && inscriptionMatch;
+      });
+
+      if (exactMatches.length > 0) {
+        filtered = exactMatches;
         setIsSimilarResults(false);
       } else {
-        // Multiple fields search - try exact match first, then similarity
-        const exactMatches = users.filter((u) => {
-          const matches = [];
+        // No exact matches → similarity search
+        filtered = users
+          .map((user) => ({
+            user,
+            similarityScore: getUserSimilarityScore(user, criteria),
+          }))
+          .filter((r) => r.similarityScore > 0.3)
+          .sort((a, b) => b.similarityScore - a.similarityScore)
+          .slice(0, 20)
+          .map((r) => r.user);
 
-          if (fName) {
-            matches.push(u.firstName?.toLowerCase().includes(fName));
-          }
-          if (lName) {
-            matches.push(u.lastName?.toLowerCase().includes(lName));
-          }
-          if (ins) {
-            matches.push(
-              u.inscription?.toLowerCase().includes(ins) ||
-                u.inscription2?.toLowerCase().includes(ins)
-            );
-          }
-
-          // All filled fields must match (AND logic)
-          return matches.every(Boolean);
-        });
-
-        if (exactMatches.length > 0) {
-          // Use exact matches if found
-          filtered = exactMatches;
-          setIsSimilarResults(false);
-        } else {
-          // No exact matches - find similar results
-          const similarResults = users
-            .map((user) => ({
-              user,
-              similarityScore: getUserSimilarityScore(user, criteria),
-            }))
-            .filter((result) => result.similarityScore > 0.3) // Minimum 30% similarity
-            .sort((a, b) => b.similarityScore - a.similarityScore) // Sort by similarity
-            .slice(0, 20) // Limit to top 20 similar results
-            .map((result) => result.user);
-
-          filtered = similarResults;
-          setIsSimilarResults(true);
-        }
+        setIsSimilarResults(true);
       }
 
-      // Set search context based on primary field or combined search
+      // Set search context
       if (filledFields === 1) {
-        if (fName) {
+        if (fName)
           setSearchContext({ value: criteria.firstName, filter: "FIRSTNAME" });
-        } else if (lName) {
+        else if (lName)
           setSearchContext({ value: criteria.lastName, filter: "LASTNAME" });
-        } else if (ins) {
+        else if (ins)
           setSearchContext({
             value: criteria.inscription,
             filter: "INSCRIPTION",
           });
-        }
       } else {
-        setSearchContext({
-          value: "",
-          filter: "",
-        });
+        setSearchContext({ value: "", filter: "" });
       }
     }
-    // Case 2: Called from BrickPlacementHeader
+
+    // === Header search (BrickPlacementHeader) ===
     if (criteria.filter && criteria.value) {
       const term = criteria.value.trim().toLowerCase();
-
-      // Update search context
       setSearchContext({ value: criteria.value, filter: criteria.filter });
 
+      let exactMatches = [];
       switch (criteria.filter) {
         case "FIRSTNAME":
-          filtered = users.filter((u) =>
-            u.firstName?.toLowerCase().includes(term)
+          exactMatches = users.filter(
+            (u) => u.firstName?.trim().toLowerCase() === term
           );
           break;
         case "LASTNAME":
-          filtered = users.filter((u) =>
-            u.lastName?.toLowerCase().includes(term)
+          exactMatches = users.filter(
+            (u) => u.lastName?.trim().toLowerCase() === term
           );
           break;
         case "INSCRIPTION":
-          filtered = users.filter(
+          exactMatches = users.filter(
             (u) =>
-              u.inscription?.toLowerCase().includes(term) ||
-              u.inscription2?.toLowerCase().includes(term)
+              u.inscription?.trim().toLowerCase() === term ||
+              u.inscription2?.trim().toLowerCase() === term
           );
           break;
         default:
-          filtered = [];
+          exactMatches = [];
+      }
+
+      if (exactMatches.length > 0) {
+        filtered = exactMatches;
+        setIsSimilarResults(false);
+      } else {
+        // Partial match fallback
+        switch (criteria.filter) {
+          case "FIRSTNAME":
+            filtered = users.filter((u) =>
+              u.firstName?.trim().toLowerCase().includes(term)
+            );
+            break;
+          case "LASTNAME":
+            filtered = users.filter((u) =>
+              u.lastName?.trim().toLowerCase().includes(term)
+            );
+            break;
+          case "INSCRIPTION":
+            filtered = users.filter(
+              (u) =>
+                u.inscription?.trim().toLowerCase().includes(term) ||
+                u.inscription2?.trim().toLowerCase().includes(term)
+            );
+            break;
+          default:
+            filtered = [];
+        }
+        setIsSimilarResults(true);
       }
     }
 
+    // Map results and update UI
     const mapped = mapWithBricks(filtered);
     setResults(mapped);
     setShowGrid(true);
