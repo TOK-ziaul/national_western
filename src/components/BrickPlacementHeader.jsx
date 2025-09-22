@@ -4,7 +4,7 @@ import * as yup from "yup";
 import { useEffect } from "react";
 import { IoSearch } from "react-icons/io5";
 import Dropdown from "./ui/Dropdown";
-import { BsArrowLeft } from "react-icons/bs";
+import { IoMdArrowRoundBack } from "react-icons/io";
 
 const schema = yup.object({
   searchTerm: yup.string().required("Search term is required"),
@@ -69,7 +69,7 @@ const BrickPlacementHeader = ({
           onClick={handleGoBack}
           className="flex gap-2 items-center bg-navy-blue text-white rounded-full p-2 text-xl"
         >
-          <BsArrowLeft />
+          <IoMdArrowRoundBack />
         </button>
         <h1 className="md:text-[2rem] text-2xl font-gin-test mb-2">
           NWSS BRICK PLACEMENT SEARCH

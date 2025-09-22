@@ -48,13 +48,13 @@ export default function BrickGrid({ bricks, selectedBrick }) {
     >
       <div className="inline-block min-w-max pe-4 pb-4">
         {/* Column headers */}
-        <div className="grid grid-cols-[3rem_1fr] sticky top-0 bg-white z-20">
-          <div className="w-14 h-14"></div> {/* corner */}
+        <div className="grid md:grid-cols-[3.5rem_1fr] grid-cols-[2.5rem_1fr] sticky top-0 bg-white z-20">
+          <div className="md:w-14 md:h-14 w-10 h-10"></div> {/* corner */}
           <div className="grid grid-cols-34 gap-2">
             {cols.map((c) => (
               <div
                 key={c}
-                className="flex items-center justify-center text-gray-800/90 text-lg w-14 h-14"
+                className="flex items-center justify-center text-gray-800/90 text-base md:text-lg md:w-14 md:h-14 w-10 h-10 "
               >
                 {c}
               </div>
@@ -69,7 +69,7 @@ export default function BrickGrid({ bricks, selectedBrick }) {
             {rows.map((r) => (
               <div
                 key={r}
-                className="flex items-center justify-center text-gray-800/90 text-lg w-14 h-14"
+                className="flex items-center justify-center text-gray-800/90 text-base md:text-lg md:w-14 md:h-14 w-10 h-10 "
               >
                 {r}
               </div>
@@ -88,7 +88,7 @@ export default function BrickGrid({ bricks, selectedBrick }) {
                   <div
                     key={`${r}${c}`}
                     ref={isSelected ? selectedBrickRef : null}
-                    className={`w-14 h-14 flex items-center justify-center text-sm font-medium rounded-md ${
+                    className={`md:w-14 md:h-14 w-10 h-10 flex items-center justify-center text-sm font-medium rounded-md ${
                       filled
                         ? isSelected
                           ? "bg-blue-600 ring-4 ring-blue-300 shadow-lg"
