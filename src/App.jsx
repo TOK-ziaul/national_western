@@ -270,6 +270,7 @@ function App() {
               onSearch={(value, filter) => performSearch({ value, filter })}
               onFilterChange={(f) => console.log("Filter changed:", f)}
               searchContext={searchContext}
+              handleGoBack={() => setShowGrid(false)}
             />
             <BrickGrid bricks={results} selectedBrick={selectedBrick} />
             <ResultsTable

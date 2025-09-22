@@ -4,13 +4,19 @@ import * as yup from "yup";
 import { useEffect } from "react";
 import { IoSearch } from "react-icons/io5";
 import Dropdown from "./ui/Dropdown";
+import { BsArrowLeft } from "react-icons/bs";
 
 const schema = yup.object({
   searchTerm: yup.string().required("Search term is required"),
   filterValue: yup.string().required("Filter is required"),
 });
 
-const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
+const BrickPlacementHeader = ({
+  onSearch,
+  onFilterChange,
+  searchContext,
+  handleGoBack,
+}) => {
   const {
     register,
     handleSubmit,
@@ -58,9 +64,17 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
   return (
     <div className="bg-white md:px-6 px-4 pt-4 flex flex-col md:flex-row justify-between border-b border-gray-200">
       {/* Title */}
-      <h1 className="md:text-[2rem] text-2xl font-gin-test mb-2">
-        NWSS BRICK PLACEMENT SEARCH
-      </h1>
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={handleGoBack}
+          className="flex gap-2 items-center bg-navy-blue text-white rounded-full p-2 text-xl"
+        >
+          <BsArrowLeft />
+        </button>
+        <h1 className="md:text-[2rem] text-2xl font-gin-test mb-2">
+          NWSS BRICK PLACEMENT SEARCH
+        </h1>
+      </div>
 
       {/* Search Controls */}
       <form
@@ -93,20 +107,7 @@ const BrickPlacementHeader = ({ onSearch, onFilterChange, searchContext }) => {
           >
             <IoSearch className="w-6 h-6 text-navy-blue" />
           </button>
-          {/* {errors.searchTerm && (
-            <span className="text-red-500 text-xs absolute -bottom-4 left-0">
-              {errors.searchTerm.message}
-            </span>
-          )} */}
         </div>
-
-        {/* Search Button
-        <button
-          type="submit"
-          className="px-4 py-1 bg-teal-600 hover:bg-teal-700 text-white text-sm font-medium rounded focus:outline-none focus:ring-1 focus:ring-teal-500 transition-colors"
-        >
-          Search
-        </button> */}
       </form>
     </div>
   );

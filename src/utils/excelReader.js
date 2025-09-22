@@ -13,7 +13,7 @@ export const readExcelFile = async (filePath) => {
 
   // Normalize: skip first 2 header rows
   const cleaned = raw.slice(2).map((row) => ({
-    id: row["Master Brick Tracker "] || row["Gift ID"],
+    id: row["Master Brick Tracker "] || row["GIFT ID"],
     firstName: row["__EMPTY_1"] || row["First Name"],
     lastName: row["__EMPTY_2"] || row["Last Name"],
     inscription: row["__EMPTY_3"] || row["Brick Line 1"],
