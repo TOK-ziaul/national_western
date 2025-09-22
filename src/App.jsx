@@ -161,17 +161,54 @@ function App() {
         filtered = exactMatches;
         setIsSimilarResults(false);
       } else {
-        // No exact matches → similarity search
-        filtered = users
-          .map((user) => ({
-            user,
-            similarityScore: getUserSimilarityScore(user, criteria),
-          }))
-          .filter((r) => r.similarityScore > 0.3)
-          .sort((a, b) => b.similarityScore - a.similarityScore)
+        // No exact matches → similarity search with per-field exact prioritization
+        const fName = criteria.firstName?.trim().toLowerCase();
+        const lName = criteria.lastName?.trim().toLowerCase();
+        const ins = criteria.inscription?.trim().toLowerCase();
+
+        const ranked = users
+          .map((user) => {
+            const userFName = user.firstName?.trim().toLowerCase() || "";
+            const userLName = user.lastName?.trim().toLowerCase() || "";
+            const userIns1 = user.inscription?.trim().toLowerCase() || "";
+            const userIns2 = user.inscription2?.trim().toLowerCase() || "";
+
+            const exactFirst = fName ? userFName === fName : false;
+            const exactLast = lName ? userLName === lName : false;
+            const exactIns = ins ? userIns1 === ins || userIns2 === ins : false;
+
+            const exactCount = [exactFirst, exactLast, exactIns].filter(
+              Boolean
+            ).length;
+
+            return {
+              user,
+              exactCount,
+              similarityScore: getUserSimilarityScore(user, criteria),
+            };
+          })
+          // keep anything that has some similarity or any exact field match
+          .filter((r) => r.similarityScore > 0.0 || r.exactCount > 0)
+          .sort((a, b) => {
+            // 1) prioritize users with more exact field matches
+            if (b.exactCount !== a.exactCount)
+              return b.exactCount - a.exactCount;
+            // 2) then by similarity score
+            if (b.similarityScore !== a.similarityScore)
+              return b.similarityScore - a.similarityScore;
+            // 3) stable fallback: by last name, then first name
+            const aName = `${a.user.lastName || ""} ${a.user.firstName || ""}`
+              .trim()
+              .toLowerCase();
+            const bName = `${b.user.lastName || ""} ${b.user.firstName || ""}`
+              .trim()
+              .toLowerCase();
+            return aName.localeCompare(bName);
+          })
           .slice(0, 20)
           .map((r) => r.user);
 
+        filtered = ranked;
         setIsSimilarResults(true);
       }
 
