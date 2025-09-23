@@ -6,16 +6,6 @@ export default function ResultsTable({
   onDonorClick,
   isSimilarResults = false,
 }) {
-  const [selectedUserId, setSelectedUser] = useState(null);
-
-  const handleDropDown = (userId) => {
-    if (selectedUserId === userId) {
-      setSelectedUser(null);
-    } else {
-      setSelectedUser(userId);
-    }
-  };
-
   return (
     <div
       className={`mt-2 h-[12rem]  ${
@@ -39,68 +29,61 @@ export default function ResultsTable({
           <table className="w-full">
             <tbody>
               {results.map((r, i) => {
-                const isSelectedUser =
-                  selectedUserId ===
-                  r.id + r.inscription.trim().split(/\s+/)[0];
+                const isBothInscriptions = r.inscription && r.inscription2;
 
                 return (
-                  <div
-                    className={`hover:bg-gray-50 border-b text-navy-blue font-medium md:text-2xl text-lg flex flex-col py-2 md:px-4 px-2 cursor-pointer ${
+                  <tr
+                    onClick={() => onDonorClick && onDonorClick(r)}
+                    key={i}
+                    className={`hover:bg-gray-50 border-b text-navy-blue font-medium md:text-2xl text-lg flex justify-between py-1 md:px-4 px-2 cursor-pointer ${
                       isSimilarResults ? "opacity-90" : ""
                     }`}
                   >
-                    <tr
-                      onClick={() => onDonorClick && onDonorClick(r)}
-                      key={i}
-                      className={`flex items-center justify-between`}
-                    >
-                      <td className="p-2 flex items-center gap-2">
-                        <span className="text-navy-blue font-medium  me-4">
-                          {i + 1}
-                        </span>
+                    <td className="p-2 flex items-start gap-2">
+                      <span className="text-navy-blue font-medium  me-4">
+                        {i + 1}.
+                      </span>
+                      <div>
                         <button className="text-navy-blue hover:text-blue-600   transition-colors">
                           {r.firstName} {r.lastName}
                         </button>
-                        <IoIosArrowDown
-                          onClick={() =>
-                            handleDropDown(
-                              r.id + r.inscription.trim().split(/\s+/)[0]
-                            )
-                          }
-                          className={`mt-1 transition-all duration-300
-                        ${isSelectedUser ? "-rotate-180" : ""} 
-                        `}
-                        />
-                      </td>
-                      <td className="p-2 ">
-                        {r.row && r.col ? (
-                          <>
-                            Row {r.row}, Col {r.col}
-                          </>
-                        ) : (
-                          <span className="text-gray-500">
-                            No brick placement
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                    <div
-                      className={`w-fit ms-10 md:ms-12  flex flex-col gap-1.5 ${
-                        isSelectedUser
-                          ? r.inscription && r.inscription2
-                            ? "h-[4rem]"
-                            : "h-[2rem]"
-                          : "h-0"
-                      } overflow-hidden transition-all duration-500 text-base md:!text-xl`}
-                    >
-                      {r.inscription && (
-                        <span>Brick Line 1: {r.inscription.slice(0, 50)}</span>
+                        <div
+                          className={`w-fit flex flex-col gap-1.5 ${
+                            isBothInscriptions ? "h-[4rem]" : "h-[2rem]"
+                          } overflow-hidden transition-all duration-500 text-base md:!text-xl`}
+                        >
+                          {r.inscription && (
+                            <span>
+                              {!isBothInscriptions
+                                ? "Inscription: "
+                                : "Inscription 1: "}
+                              {r.inscription.slice(0, 50)}
+                            </span>
+                          )}
+                          {r.inscription2 && (
+                            <span>
+                              {" "}
+                              {!isBothInscriptions
+                                ? "Inscription: "
+                                : "Inscription 2: "}
+                              {r.inscription2}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-2 ">
+                      {r.row && r.col ? (
+                        <>
+                          Row {r.row}, Col {r.col}
+                        </>
+                      ) : (
+                        <span className="text-gray-500">
+                          No brick placement
+                        </span>
                       )}
-                      {r.inscription2 && (
-                        <span>Brick Line 2: {r.inscription2}</span>
-                      )}
-                    </div>
-                  </div>
+                    </td>
+                  </tr>
                 );
               })}
             </tbody>
