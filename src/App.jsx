@@ -52,6 +52,23 @@ function App() {
         : [];
 
       const brick = bricks.find((b) => {
+        // First try exact string match
+        if (String(b.giftId) === String(u.id)) {
+          return true;
+        }
+
+        // For "NO ID" entries, try matching with different formats
+        if (String(u.id).includes("NO ID")) {
+          // Try matching "NO ID1 Mimi" with "NO ID 1 Mimi" (with space)
+          const userNoIdPart = String(u.id).replace(/NO ID/i, "").trim();
+          const brickNoIdPart = String(b.giftId).replace(/NO ID/i, "").trim();
+
+          if (userNoIdPart && userNoIdPart === brickNoIdPart) {
+            return true;
+          }
+        }
+
+        // Try extracted numeric ID match
         if (extractGiftId(b.giftId) === String(u.id)) {
           if (
             inscriptionWords.some((word) =>
@@ -62,7 +79,7 @@ function App() {
           }
         }
 
-        return String(b.giftId) === String(u.id);
+        return false;
       });
 
       return {
